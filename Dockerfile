@@ -21,7 +21,7 @@
 # ---------------------------------------
 # Start with the base Alpine Linux image
 # ---------------------------------------
-FROM alpine:latest
+FROM debian:buster
 WORKDIR /root
 
 # ---------------------------------------
@@ -34,9 +34,9 @@ ARG BUILD_VERSION=v0.0.4
 # ---------------------------------------
 LABEL name="Monocle Gateway"
 LABEL url="https://monoclecam.com"
-LABEL image="monoclecam/monocle-gateway"
+LABEL image="mzac23/monocle-gateway-arm64"
 LABEL maintainer="support@monoclecam.com"
-LABEL description="This image provides a Docker container for the Monocle Gateway service based on Alpine Linux."
+LABEL description="This image provides an ARM64 Docker container for the Monocle Gateway service based on Debian Linux."
 LABEL vendor="shadeBlue, LLC."
 LABEL version=$BUILD_VERSION
 
@@ -50,15 +50,8 @@ RUN mkdir -p /etc/monocle
 # Install Monocle Gateway dependencies
 # and other useful utilties
 # ---------------------------------------
-RUN apk update &&      \
-    apk add --no-cache \
-    wget               \
-    curl               \
-    libstdc++          \
-    nano               \
-    net-tools          \
-    openssl            \
-    ca-certificates
+RUN apt update  && \
+    apt install -y bash libcap2-bin nano net-tools wget
 
 # ---------------------------------------
 # Download versioned Monocle Gateway
@@ -71,11 +64,17 @@ RUN apk update &&      \
 # Remove the downloaded Monocle Gateway 
 # archive files
 # ---------------------------------------
-RUN wget -c https://files.monoclecam.com/monocle-gateway/linux/monocle-gateway-linux-arm64-$BUILD_VERSION.tar.gz -O monocle-gateway.tar.gz && \
+RUN wget -c https://files.monoclecam.com/monocle-gateway/linux/monocle-gateway-linux-arm64-$BUILD_VERSION.tar.gz -O /root/monocle-gateway.tar.gz && \
     cd /usr/local/bin/ && \
     tar xvzf /root/monocle-gateway.tar.gz monocle-gateway && \ 
     tar xvzf /root/monocle-gateway.tar.gz monocle-proxy  && \
     rm /root/monocle-gateway.tar.gz
+
+# ---------------------------------------
+# Cleanup APT Cache
+RUN apt-get clean autoclean && \
+    apt-get autoremove --yes && \
+    rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 # ---------------------------------------
 # Expose required TCP ports 
