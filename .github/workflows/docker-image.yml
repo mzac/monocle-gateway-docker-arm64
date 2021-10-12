@@ -37,7 +37,7 @@ jobs:
             --cache-to "type=local,dest=/tmp/.buildx-cache" \
             --platform linux/arm64 \
             --output "type=image,push=false" \
-            --tag mzac23/monocle-gateway-docker-arm64:latest \
+            --tag mzac23/monocle-gateway-arm64:latest \
             --file ./Dockerfile ./
 
       - name: Login to DockerHub
@@ -52,9 +52,9 @@ jobs:
             --cache-from "type=local,src=/tmp/.buildx-cache" \
             --platform linux/arm64 \
             --output "type=image,push=true" \
-            --tag mzac23/monocle-gateway-docker-arm64:latest \
+            --tag mzac23/monocle-gateway-arm64:latest \
             --file ./Dockerfile ./
 
       - name: Inspect image
         run: |
-          docker buildx imagetools inspect mzac23/monocle-gateway-docker-arm64:latest
+          docker buildx imagetools inspect mzac23/monocle-gateway-arm64:latest
